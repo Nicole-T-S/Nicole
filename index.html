@@ -43,6 +43,8 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            position: relative;
+            z-index: 1;
         }
 
         .scroll-container {
@@ -138,6 +140,49 @@
             height: 100vh;
             display: block;
         }
+
+        .score-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            width: 100px;
+            height: 100px;
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .score-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 3;
+        }
+
+        /* Make score display visible in face12 section */
+        .face-section:nth-child(12) {
+            position: relative;
+        }
+
+        .face-section:nth-child(12) .score-display {
+            display: block !important;
+            pointer-events: none;
+        }
+
+        .face-section:nth-child(12) img {
+            opacity: 0.5;
+        }
+
+        /* Ensure score0 is visible by default */
+        .score-display img[alt="Score 0"] {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -154,8 +199,9 @@
             <img src="Images/face3.png" alt="Face 3">
             <div class="button-container">
                 <button><img src="Images/Button1.png" alt="Button 1"></button>
-                <button><img src="Images/BUtton2.png" alt="Button 2"></button>
                 <button class="correct"><img src="Images/Button3.png" alt="Button 3"></button>
+                <button><img src="Images/BUtton2.png" alt="Button 2"></button>
+                
             </div>
         </section>
         <section class="face-section">
@@ -166,8 +212,8 @@
             <img src="Images/face5.png" alt="Face 5">
             <div class="button-container">
                 <button><img src="Images/Button4.png" alt="Button 4"></button>
+                <button><img src="Images/BUtton5.png" alt="Button 5"></button>
                 <button class="correct"><img src="Images/Button6.png" alt="Button 6"></button>
-                <button><img src="Images/Button5.png" alt="Button 5"></button>        
             </div>
         </section>
         <section class="face-section">
@@ -178,7 +224,8 @@
             <div class="button-container">
                 <button class="correct"><img src="Images/Button9.png" alt="Button 9"></button>
                 <button><img src="Images/Button7.png" alt="Button 7"></button>
-                <button><img src="Images/Button8.png" alt="Button 8"></button>                
+                <button><img src="Images/BUtton8.png" alt="Button 8"></button>
+                
             </div>
         </section>
         <section class="face-section">
@@ -187,12 +234,18 @@
         <section class="face-section">
             <img src="Images/face9.png" alt="Face 9">
             <div class="button-container">
-                <button><img src="Images/Button100.png" alt="Button 10"></button>
-                <button><img src="Images/BUtton100.png" alt="Button 11"></button>
+                <button><img src="Images/Button10.png" alt="Button 10"></button>
+                <button><img src="Images/Button11.png" alt="Button 11"></button>
             </div>
         </section>
         <section class="face-section">
             <img src="Images/face10.png" alt="Face 10">
+        </section>
+        <section class="face-section">
+            <img src="Images/face12.png" alt="Face 2">
+            <div class="score-display">
+                <img src="Images/score0.png" alt="Score Display">
+            </div>
         </section>
         <section class="face-section">
             <img src="Images/face11.png" alt="Face 11">
@@ -200,6 +253,38 @@
     </div>
 
     <script>
+        // Initialize score counter and score image mapping
+        let score = 0;
+        const scoreImages = {
+            0: 'Images/score0.png',
+            1: 'Images/score1.png',
+            2: 'Images/score2.png',
+            3: 'Images/score3.png'
+        };
+
+        // Function to update score display
+        function updateScoreDisplay() {
+            const scoreDisplay = document.querySelector('.score-display');
+            if (!scoreDisplay) return;
+
+            // Get the current score image based on score
+            const currentScoreImage = scoreImages[Math.min(Math.max(score, 0), 3)];
+            
+            // Update the display
+            const scoreImg = scoreDisplay.querySelector('img');
+            if (scoreImg) {
+                scoreImg.src = currentScoreImage;
+                console.log('Updating score display to:', currentScoreImage); // Debug log
+            }
+        }
+
+        // Initial score display
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial score to 0 and update display
+            score = 0;
+            updateScoreDisplay();
+        });
+
         // Add visible class to sections when they come into view
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -229,6 +314,11 @@
                     this.classList.add('clicked');
                     const successMessage = document.querySelector('.success-message');
                     successMessage.style.display = 'block';
+                    
+                    // Increment score
+                    score += 1;
+                    console.log('Current score:', score);
+                    updateScoreDisplay();
                     
                     // Get current section and find next section
                     const currentSection = this.closest('.face-section');
